@@ -3,6 +3,7 @@
 namespace App\Tests\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserControllerTest extends WebTestCase
 {
@@ -10,14 +11,14 @@ class UserControllerTest extends WebTestCase
     {
         $client = static::createClient();
         $client->request("GET", "/users");
-        $this->assertEquals(200, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_OK, $client->getResponse()->getStatusCode());
     }
 
     public function testCreateError()
     {
         $client = static::createClient();
         $client->jsonRequest("POST", "/users");
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
     }
 
     public function testCreateEmailError()
@@ -28,10 +29,10 @@ class UserControllerTest extends WebTestCase
             'firstName' => "Rafael",
             "lastName" => "Custodio"
         ]);
-        $this->assertEquals(400, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_BAD_REQUEST, $client->getResponse()->getStatusCode());
         $json = json_decode($client->getResponse()->getContent(), JSON_OBJECT_AS_ARRAY);
-        $this->assertCount(1, $json['violations']);
-        $this->assertEquals('email', $json['violations'][0]['propertyPath']);
+        $this->assertCount(1, $json['errors']);
+        $this->assertEquals('email', array_keys($json['errors'][0])[0]);
     }
 
     public function testGetNotFoundUser()
@@ -39,6 +40,6 @@ class UserControllerTest extends WebTestCase
         $client = static::createClient();
         $client->request("GET", "/users/0");
 
-        $this->assertEquals(404, $client->getResponse()->getStatusCode());
+        $this->assertEquals(Response::HTTP_NOT_FOUND, $client->getResponse()->getStatusCode());
     }
 }
