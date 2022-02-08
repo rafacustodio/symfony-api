@@ -85,6 +85,6 @@ class UserController extends AbstractController
             return new Response('', Response::HTTP_NOT_FOUND);
         }
         $this->userRepository->delete($user);
-        return new Response('');
+        return new Response('', Response::HTTP_NO_CONTENT);
     }
 }
